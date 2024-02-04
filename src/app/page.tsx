@@ -1,6 +1,7 @@
 'use client';
 import Container from '@/components/Container';
 import Navbar from '@/components/Navbar';
+import WeatherIcon from '@/components/WeatherIcon';
 import { kelvinToCelsius } from '@/utils/ConvertKelvinToCelsius';
 import { fetchData } from '@/utils/DataFetch';
 import { format, parseISO } from 'date-fns';
@@ -112,7 +113,11 @@ export default function Home() {
                     key={index}
                     className="flex flex-col gap-2 items-center text-xs font-semibold"
                   >
-                    <p>{format(parseISO(data.dt_txt), 'h:mm a')}</p>
+                    <p className="whitespace-nowrap">
+                      {format(parseISO(data.dt_txt), 'h:mm a')}
+                    </p>
+                    <WeatherIcon iconName={data.weather[0].icon} />
+                    <p>{kelvinToCelsius(data?.main.temp ?? 0)}°</p>
                   </div>
                 ))}
               </div>
