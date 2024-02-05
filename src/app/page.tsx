@@ -1,10 +1,13 @@
 'use client';
 import Container from '@/components/Container';
 import Navbar from '@/components/Navbar';
+import WeatherDetails from '@/components/WeatherDetails';
 import WeatherIcon from '@/components/WeatherIcon';
 import { kelvinToCelsius } from '@/utils/ConvertKelvinToCelsius';
+import { convertWindSpeed } from '@/utils/ConvertWindSpeed';
 import { fetchData } from '@/utils/DataFetch';
-import { format, parseISO } from 'date-fns';
+import { metersToKilometers } from '@/utils/MetersToKilometers';
+import { format, fromUnixTime, parseISO } from 'date-fns';
 import { useQuery } from 'react-query';
 
 type WeatherData = {
@@ -116,16 +119,46 @@ export default function Home() {
                     <p className="whitespace-nowrap">
                       {format(parseISO(data.dt_txt), 'h:mm a')}
                     </p>
-                    <WeatherIcon iconName={data.weather[0].icon} />
+                    <WeatherIcon iconname={data.weather[0].icon} />
                     <p>{kelvinToCelsius(data?.main.temp ?? 0)}°</p>
                   </div>
                 ))}
               </div>
             </Container>
           </div>
+          <div className="flex gap-4">
+            {/* Left Cell */}
+            <Container className="w-fit justify-center flex-col px-4 items-center">
+              <p className="capitalize text-center">
+                {dataForToday?.weather[0].description}
+              </p>
+              <WeatherIcon iconname={dataForToday?.weather[0].icon ?? ''} />
+            </Container>
+            {/* Right Cell */}
+            <Container className="bg-yellow-300/80 px-6 gap-4 justify-between overflow-x-auto">
+              <WeatherDetails
+                visibility={metersToKilometers(
+                  dataForToday?.visibility ?? 10000
+                )}
+                airPressure={`${dataForToday?.main.pressure} hPa`}
+                humidity={`${dataForToday?.main.humidity}%`}
+                sunrise={format(
+                  fromUnixTime(data?.city.sunrise ?? 1707096005),
+                  'H:mm'
+                )}
+                sunset={format(
+                  fromUnixTime(data?.city.sunset ?? 1707135626),
+                  'H:mm'
+                )}
+                windSpeed={convertWindSpeed(dataForToday?.wind.speed ?? 1.64)}
+              />
+            </Container>
+          </div>
         </section>
         {/* 7 Day Forecast Data */}
-        <section></section>
+        <section className="flex w-full flex-col gap-4">
+          <p className="text-2xl">Forecast (7 Days)</p>
+        </section>
       </main>
     </div>
   );
